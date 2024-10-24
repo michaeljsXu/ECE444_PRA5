@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 import pickle
@@ -21,7 +21,72 @@ def predict(text):
 
 @application.route("/")
 def index():
-    return "Your Flask App Works! V1.0"
+    return render_template_string('''
+        <!doctype html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            <title>Not Fake News Co.</title>
+            <style>
+              .container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                height: 100vh;
+                text-align: center;
+              }
+              .form-group {
+                width: 100%;
+              }
+              #textInput {
+                width: 100%;
+                height: 200px;
+                max-height: 1000px;
+                resize: vertical;
+              }
+              .content {
+                width: 100%;
+                max-width: 800px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="content">
+                <h1>Fake News detector</h1>
+                <form id="predictForm">
+                  <div class="form-group">
+                    <textarea class="form-control" id="textInput" name="text"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Is this real?</button>
+                </form>
+                <div id="result"></div>
+              </div>
+            </div>
+            <script>
+              document.getElementById('predictForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var text = document.getElementById('textInput').value;
+                fetch('/predict', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ text: text })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  document.getElementById('result').innerText = 'Prediction: ' + data.prediction;
+                })
+                .catch(error => {
+                  document.getElementById('result').innerText = 'Error: ' + error;
+                });
+              });
+            </script>
+          </body>
+        </html>
+    ''')
 
 # returns FAKE if fake
 # returns REAL if real
