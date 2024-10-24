@@ -28,10 +28,15 @@ def index():
 @application.route("/predict", methods=['POST'])
 def predict_route():
     try:
-        data = request.get_json(force=True)
+        data = request.get_json()
+        if 'text' not in data:
+            raise ValueError("Missing 'text' in request data")
+        if not isinstance(data['text'], str):
+            raise ValueError("'text' must be a string")
         text = data['text']
-        print(text)
         prediction = predict(text)
+        if prediction not in ['FAKE', 'REAL']:
+            raise ValueError("Prediction must be either 'FAKE' or 'REAL'")
         return jsonify({'prediction': prediction}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
