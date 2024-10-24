@@ -54,7 +54,7 @@ def index():
           <body>
             <div class="container">
               <div class="content">
-                <h1>Fake News detector</h1>
+                <h1>Fake News Detector</h1>
                 <form id="predictForm">
                   <div class="form-group">
                     <textarea class="form-control" id="textInput" name="text"></textarea>
